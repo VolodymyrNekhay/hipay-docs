@@ -1483,7 +1483,6 @@ Please find here the options for the HiPay configuration.
 |Payment Action|Sale *(Authorization * *+ Capture)* Authorization (Authorization only)|-|Please refer to *HiPayTPP-GatewayAPI* documentation, chapter 3.1 *Request a New Order (Order Parameters – operation)*
 |HiPay CSS content|Text|hipaycss|HiPay’s content with custom CSS
 |Display card selector|true / false|false|Enables/disables the payment method selector on iFrame and Hosted pages
-|Available payment products|String|bcmc, cb, ideal, maestro, mastercard, przelewy24, sofort|List of payment products separated by a comma (“,”)<br/>(e.g.: visa,mastercard,americanexpress)
 |3-D Secure Threshold Rule|Integer|  0 |If the total amount of the order is higher than the specified sum, then 3-D Secure will be forced. If 0 is specified, the rule is disabled.
 |iFrame Height|                   Integer |                                  750 |                                                       If the iFrame operating mode is chosen, you can select your iFrame height to fit with your CSS.
 |iFrame Width|                    Integer  |                                 950      |                                                  If iFrame operating mode is chosen, you can select your iFrame width to fit with your CSS.
