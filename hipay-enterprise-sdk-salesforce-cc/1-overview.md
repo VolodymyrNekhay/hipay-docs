@@ -1300,6 +1300,42 @@ if (authorizationResult.not_supported || authorizationResult.error) {
 ```
 ![](images/image38.png)
 
+In the `start()` function add next changes.
+Replace:
+```html
+var orderPlacementStatus = Order.submit(order);
+if (!orderPlacementStatus.error) {
+    clearForms();
+}
+return orderPlacementStatus;
+```
+
+With:
+```html
+if (sitePrefs.custom["hipayEnabled"]) {
+    if (handlePaymentsResult.authorized) {
+        var orderPlacementStatus = Order.submit(order);
+        if (!orderPlacementStatus.error) {
+            clearForms();
+        }
+        return orderPlacementStatus;
+    } else {
+        return {
+            Order: order,
+            order_created: false
+        };
+    }
+} else {
+    var orderPlacementStatus = Order.submit(order);
+    if (!orderPlacementStatus.error) {
+        clearForms();
+    }
+    return orderPlacementStatus;
+}
+```
+![](images/image38_2.png)
+
+
 
 ###3.4.1 Configurations for the HiPay multi-account feature
 
@@ -1438,6 +1474,8 @@ Please find here the options for the HiPay configuration.
 
 | Property name   |      Possible values    |      Default value     |      Description    |
 |----------|:-------------:|:-------------:|:-------------:|
+|HiPay Enabled |           true / false |  false | Enable/disable HiPay functionality
+|Enable One-Click payments |           true / false |  false | Enable/disable One-Click payments
 |HiPay Operation Mode |           hosted *(Hosted page)*<br/>iframe (iFrame)<br/>api (API) |  hosted *(Hosted page)* | Defines which operation payment mode to use
 |Enable Tokenization Test Mode|   true / false|false|Test Mode: If enabled, the module will use the HiPay Enterprise test platform
 |3-D Secure|0 *(Bypass 3-D Secure authentication)*<br/>1 (3-D Secure authentication,<br/>if available)<br/>2 (3-D Secure authentication mandatory)|0 *(Bypass 3-D Secure authentication)*|Allows the activation of 3-D Secure if the card has been enrolled
