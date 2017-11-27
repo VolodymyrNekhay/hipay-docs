@@ -1197,9 +1197,19 @@ For case if AuthorizationPipeline is “HIPAY_HOSTED” or “HIPAY” add the s
 3.  Decision Key : AuthorizationResult.authorized
 ![](images/image31.png)
 
+12. **app_storefront_pipelines/cartridge/pipelines/PaymentInstruments.xml**
+There is a change made in PaymentInstruments-Llist to get the saved credit cards info. 
+After the Account-RequireLogin call node add a decision node with next parameters:
+1.  Decision Key : dw.system.Site.getCurrent().getCustomPreferenceValue("hipayEnabled") && dw.system.Site.getCurrent().getCustomPreferenceValue("hipayEnableOneClick")
 
-###The steps 12 and 13 should be applied only to controller storefront version.
-12. **app_storefront_controllers/cartridge/controllers/COBilling.js**
+The `no` transition goes to the default implementation. For case if HiPay and HiPay One-Click enabled add a GetCustomerPaymentInstruments pipelet with next parameters:
+1.  Customer : CurrentCustomer
+2.  PaymentMethod : "HIPAY_CREDIT_CARD"
+3.  PaymentInstruments : PaymentInstruments
+![](images/image65.png)
+
+###The next steps should be applied to controller storefront version.
+13. **app_storefront_controllers/cartridge/controllers/COBilling.js**
 
 Add:
 ```html
@@ -1268,7 +1278,7 @@ if (sitePrefs.custom["hipayEnabled"] && sitePrefs.custom["hipayEnableOneClick"])
 ![](images/image36.png)
 
 
-13. **app_storefront_controllers/cartridge/controllers/COPlaceOrder.js**
+14. **app_storefront_controllers/cartridge/controllers/COPlaceOrder.js**
 
 Add:
 ```html
@@ -1335,7 +1345,27 @@ if (sitePrefs.custom["hipayEnabled"]) {
 ```
 ![](images/image38_2.png)
 
+15. **app_storefront_controllers/cartridge/controllers/PaymentInstruments.js**
 
+In the `list()` function add next changes.
+Add
+
+```html
+var sitePrefs = dw.system.Site.getCurrent().getPreferences();
+```
+Repalce:
+```html
+var paymentInstruments = wallet.getPaymentInstruments(dw.order.PaymentInstrument.METHOD_CREDIT_CARD);
+```
+With:
+```html
+if (sitePrefs.custom["hipayEnabled"] && sitePrefs.custom["hipayEnableOneClick"]) {
+    var paymentInstruments = wallet.getPaymentInstruments('HIPAY_CREDIT_CARD');
+} else {
+    var paymentInstruments = wallet.getPaymentInstruments(dw.order.PaymentInstrument.METHOD_CREDIT_CARD);
+}
+```
+![](images/image66.png)
 
 ###3.4.1 Configurations for the HiPay multi-account feature
 
