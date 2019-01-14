@@ -441,6 +441,9 @@ the existing fields.
     orders hung in status `CREATED` and left unprocessed for payment
     are cleared.
 
+	-   **List of shipping methods** – A comma-separated list of the
+    shipping methods that should be in use for the Oney payment method.
+
 
 -   Service configuration:
 
@@ -532,6 +535,9 @@ Add:
 	<link rel="stylesheet" href="${URLUtils.staticURL('/css/hipay.css')}" /> 
 	<isinclude template="checkout/components/devicefingerprint"/>
 		<isscript>
+		var HiPayHelper = require('int_hipay_controllers/cartridge/scripts/lib/hipay/HiPayHelper');
+		helper = new HiPayHelper();
+		var renderOney  = helper.validateOneyAvailability(pdict.Basket);
 		var HiPayConfig = require('int_hipay_controllers/cartridge/scripts/lib/hipay/HiPayConfig').HiPayConfig;
 		var isHiPayHostedMode = false;
 		if(HiPayConfig.hipayOperationMode == HiPayConfig.OPERATION.HOSTED || HiPayConfig.hipayOperationMode == HiPayConfig.OPERATION.IFRAME) {
@@ -551,6 +557,8 @@ Add:
 		<isif condition="${isHiPayHostedMode && paymentMethodType.value.indexOf('HIPAY_HOSTED') == -1}"><iscontinue/></isif>
 		<iscomment>Skip hosted page payment method if is in API operation mode.</iscomment>
 		<isif condition="${!isHiPayHostedMode && paymentMethodType.value.indexOf('HIPAY_HOSTED') > - 1}"> <iscontinue/></isif>
+		<iscomment>Skip Oney pay if product and shipping is not configured for it.</iscomment>
+        <isif condition="${renderOney === false && paymentMethodType.value.indexOf('ONEY_FACILITY_PAY') > - 1}"> <iscontinue/></isif>
 		</isif>
 	<div class="form-row label-inline">
 		<isset name="radioID" value="${paymentMethodType.value}" scope="page"/>
@@ -588,7 +596,7 @@ After:
 </legend>
 ```
 
-![](images/image8.png)
+![](images/image8_oney.png)
 
 After an existing code block for payment methods rendering add: 
 ``` html 
@@ -1073,7 +1081,9 @@ Before:
 
 ![](images/image24.png)
 
-8. **Create an app_storefront_core/cartridge/forms/default/hipaymethods.xml file** 
+8. **Create an app_storefront_core/cartridge/forms/default/
+9. 
+10.  file** 
 
 See the int_hipay_controllers/cartridge/forms/default/hipaymethods_sample.xml for an example
 
@@ -1473,7 +1483,7 @@ capture amounts for orders already authorized.
 
 3.  Tick off the ***HiPay Integration*** module and click on ***Update***.
 
-![](images/image45.png)
+![](images/image45_oney.png)
 
 4.  Go to **Business Manager&gt; Merchant Tools&gt;**: the HiPay module should be displayed.
 
@@ -1491,12 +1501,27 @@ capture amounts for orders already authorized.
 
 - Partial or full captures can be requested. If the requested amount is captured, a HiPay notification will be sent to Salesforce Commerce Cloud and the **Captured amount** will be updated too.
 
+- Go to ***HiPay Integration &gt; Categories Configuration.***
+
+- This page allows to map SFCC product categories with HiPay’s categories. Once categories mapped, save configuration. In case if a SFCC category is not mapped – the Oney payment method will not be rendered if basket contains at least one product with not configured category.
+
+![](images/image48_oney_categories.png)
+
+- Go to ***HiPay Integration &gt; Shipping Configuration.***
+
+- This page allows to configure SFCC shipping methods with HiPay’s delivery methods. The ‘Order preparation estimated time’ and ‘Delivery estimated time’ fileds use Ingerer, meaning 1 is one day, 2 is two days etc. Once shipping methods, save configuration. In case if a SFCC shipping method is not configured – the Oney payment method will not be rendered if the not-configured shipping method selected on the shipping page.
+
+![](images/image48_oney_shipping.png)
+
+
+
+
 **HiPay Site Preferences**
 
 Go to **Merchant Tools &gt; Site Preferences &gt; Custom Preferences &gt; HiPay Settings**.
 
 ![](images/image49.png)
-![](images/image50.png)
+![](images/image50_oney.png)
 
 Please find here the options for the HiPay configuration.
 
@@ -1517,6 +1542,7 @@ Please find here the options for the HiPay configuration.
 |iFrame Height|                   Integer |                                  750 |                                                       If the iFrame operating mode is chosen, you can select your iFrame height to fit with your CSS.
 |iFrame Width|                    Integer  |                                 950      |                                                  If iFrame operating mode is chosen, you can select your iFrame width to fit with your CSS.
 |Hung Order Cleanup Time|         Integer      |                             30          |                                               Number of minutes after which all orders hung in status “CREATED” and left unprocessed for payment are cleared.
+|List of shipping methods|         String      |                                       |                                               A comma-separated list of the shipping methods that should be in use for the Oney payment method.
 
 ###Services
 
